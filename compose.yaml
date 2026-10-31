@@ -1,0 +1,16 @@
+services:
+  colorpaletts:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - palette-data:/app/data
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    init: true
+volumes:
+  palette-data:
