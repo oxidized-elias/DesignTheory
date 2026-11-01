@@ -89,6 +89,33 @@ docker run -d --name designtheory --init --restart unless-stopped \
 
 Open **http://localhost:3001**. This standalone command uses a separate volume from Compose. See [Docker setup](docs/DOCKER.md) for updates, backups, existing volumes and remote access.
 
+### Connecting Docker to host services
+
+When using bridge networking with Ollama on the Docker host, include this mapping under your application service (the bundled `compose.yaml` already includes it under `colorpaletts`):
+
+```yaml
+services:
+  colorpaletts:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+```
+
+For `docker run`, use `--add-host=host.docker.internal:host-gateway`, as in the examples above. In **Settings → Ollama vision**, enter `http://host.docker.internal:11434`, load models, select a vision model, and save. Existing saved settings take precedence over `OLLAMA_URL`.
+
+On Linux, the mapping resolves the host address but cannot reach Ollama if it listens only on `127.0.0.1`. Either configure Ollama to listen on an interface reachable from Docker, or use host networking. For host networking, remove the service's `ports` mapping and configure:
+
+```yaml
+    network_mode: host
+    environment:
+      HOST: 127.0.0.1
+      PORT: 3001
+      OLLAMA_URL: http://127.0.0.1:11434
+```
+
+Use `http://127.0.0.1:11434` in the saved Ollama settings with host networking. Recreate the service after changing networking (`docker compose up -d --force-recreate`), then click **Load models** again. Host networking uses host port `3001` directly.
+
 ### Manual Install:
 
 Dependencies:
