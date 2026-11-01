@@ -17,3 +17,18 @@ __pycache__/
 backups/
 session-*
 *.session
+
+# User-owned library files and exports
+UserData/
+userdata/
+user-data/
+uploads/
+exports/
+sessions/
+logs/
+*.db
+*.db-wal
+*.db-shm
+designtheory-backup*.json
+designtheory-selection*.json
+colorpaletts-backup*.json

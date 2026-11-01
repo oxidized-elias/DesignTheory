@@ -42,6 +42,6 @@ try:
         result = main()
     print(json.dumps(result))
 except ImportError:
-    print(json.dumps({'error': 'Instagram import needs the Python dependencies. Install server/requirements.txt or use the Docker image. You can upload all post photos below instead.'}))
+    print(json.dumps({'error': 'Instagram support could not be loaded after automatic setup. Restart the app and retry the import.'}))
 except Exception:
     print(json.dumps({'error': 'Instagram could not provide all post photos. It may require a session, be private, or be rate-limited. Upload all photos below, or configure an Instagram session on the server.'}))

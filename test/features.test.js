@@ -44,5 +44,5 @@ test('vision adapter sends the image and handles model errors without fabricatin
  }finally{globalThis.fetch=previousFetch;if(previousModel===undefined)delete process.env.OLLAMA_MODEL;else process.env.OLLAMA_MODEL=previousModel;}
 });
 test('templates can be reused without editing their originals',()=>{
- const savedFont=structuredClone(fontTemplates[0]);savedFont.fonts[0].family='Edited';assert.equal(fontTemplates[0].fonts[0].family,'Georgia');const colors=[...paletteTemplates[0][1]];colors.push('#000000');assert.equal(paletteTemplates[0][1].length,5);
+ const savedFont=structuredClone(fontTemplates[0]);savedFont.fonts[0].family='Edited';assert.equal(fontTemplates[0].fonts[0].family,'Playfair Display');const colors=[...paletteTemplates[0][1]];colors.push('#000000');assert.equal(paletteTemplates[0][1].length,5);
 });

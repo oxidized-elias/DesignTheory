@@ -7,7 +7,7 @@ export const paletteTemplates = [
  ['Sunday market',['#955747','#CC8F73','#E2C19D','#E8DCC3','#798166'],'A few of our favorite natural tones.']
 ];
 export const fontTemplates = [
- {name:'The editorial',description:'A classic serif headline with a clean sans-serif companion.',fonts:[{family:'Georgia',role:'Heading',sample:'A story worth telling.'},{family:'Arial',role:'Body',sample:'Thoughtful words, with room to breathe.'}]},
- {name:'Modern essentials',description:'Understated type for clear, everyday communication.',fonts:[{family:'Arial',role:'Heading',sample:'Less, but better.'},{family:'Verdana',role:'Body',sample:'A fresh perspective on the everyday.'}]},
- {name:'Type & texture',description:'Literary headings meet the rhythm of a monospace face.',fonts:[{family:'Georgia',role:'Heading',sample:'Notes from the studio.'},{family:'Courier New',role:'Caption',sample:'VOL. 01 — IDEAS IN PROGRESS'}]}
+ {name:'The editorial',description:'A classic serif headline with a clean sans-serif companion.',fonts:[{family:'Playfair Display',role:'Heading',sample:'A story worth telling.'},{family:'Source Sans 3',role:'Body',sample:'Thoughtful words, with room to breathe.'}]},
+ {name:'Modern essentials',description:'Understated type for clear, everyday communication.',fonts:[{family:'Inter',role:'Heading',sample:'Less, but better.'},{family:'DM Sans',role:'Body',sample:'A fresh perspective on the everyday.'}]},
+ {name:'Type & texture',description:'Literary headings meet the rhythm of a monospace face.',fonts:[{family:'Lora',role:'Heading',sample:'Notes from the studio.'},{family:'IBM Plex Mono',role:'Caption',sample:'VOL. 01 — IDEAS IN PROGRESS'}]}
 ];

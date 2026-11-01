@@ -4,7 +4,8 @@ export function validateRecord(body, kind = 'palettes') {
   if (!body || typeof body.name !== 'string' || !body.name.trim() || body.name.length > 200) throw Error('Enter a name of up to 200 characters.');
   if (!Array.isArray(body.links) || body.links.some(link => typeof link !== 'string' || !/^https?:\/\//i.test(link) || !URL.canParse(link))) throw Error('Source links must be valid HTTP or HTTPS URLs.');
   if (body.cover && (typeof body.cover !== 'string' || !imagePattern.test(body.cover) || body.cover.length > 7_000_000)) throw Error('Use a PNG, JPEG, WebP, or GIF cover image under 5 MB.');
-  const value = { name: body.name.trim(), description: typeof body.description === 'string' ? body.description.slice(0,5000) : '', links: body.links, cover: body.cover || '', favorite: body.favorite === true };
+  if (body.folderId !== undefined && (typeof body.folderId !== 'string' || body.folderId.length > 200)) throw Error('Invalid folder.');
+  const value = { folderId: body.folderId || '', name: body.name.trim(), description: typeof body.description === 'string' ? body.description.slice(0,5000) : '', links: body.links, cover: body.cover || '', favorite: body.favorite === true };
   if (kind === 'palettes') {
     if (!Array.isArray(body.colors) || !body.colors.length || body.colors.some(c => typeof c !== 'string' || !/^#[\da-f]{6}$/i.test(c))) throw Error('Add at least one valid six-digit hex color.');
     return {...value, colors: body.colors};
