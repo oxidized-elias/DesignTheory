@@ -1,4 +1,5 @@
 import express from 'express';
+import {createAccessPolicy,accessGuard} from './access.js';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -10,19 +11,17 @@ import { instagramPython } from './python.js';
 import {defaultOllamaSettings,readOllamaSettings,saveOllamaSettings,resetOllamaSettings,testOllamaSettings} from './settings.js';
 import {createFolder,validateFolder,requireFolder,deleteFolder,bulkUpdate} from './folders.js';
 
-export function createApp(databasePath = process.env.DATABASE_PATH || './data/palettes.sqlite') {
+export function createApp(databasePath = process.env.DATABASE_PATH || './data/palettes.sqlite', accessConfig = process.env) {
+  const policy = createAccessPolicy(accessConfig);
   if (databasePath !== ':memory:') mkdirSync(dirname(resolve(databasePath)), { recursive: true });
   const db = new DatabaseSync(databasePath);
   db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS palettes (id TEXT PRIMARY KEY, document TEXT NOT NULL); CREATE TABLE IF NOT EXISTS font_pairings (id TEXT PRIMARY KEY, document TEXT NOT NULL); CREATE TABLE IF NOT EXISTS folders (id TEXT PRIMARY KEY, document TEXT NOT NULL); CREATE TABLE IF NOT EXISTS settings (id TEXT PRIMARY KEY, document TEXT NOT NULL)');
   const app = express();
   app.disable('x-powered-by');
+  app.use((req,res,next) => {res.set({'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'same-origin'});next();});
+  app.use('/api', accessGuard(policy));
   app.use('/api/library/import', express.json({limit:'100mb'}));
   app.use(express.json({limit:'32mb'}));
-  app.use('/api', (req,res,next) => {
-    res.set('Cache-Control','no-store');
-    if (!['GET','HEAD','OPTIONS'].includes(req.method) && req.get('sec-fetch-site') === 'cross-site') return res.status(403).json({error:'Cross-site writes are not allowed.'});
-    next();
-  });
   app.post('/api/library/import', (req,res,next) => {
     try {res.json(importBackup(db,req.body?.backup,{preview:req.body?.preview===true}));}catch(e){next(e);}
   });

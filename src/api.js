@@ -1,5 +1,7 @@
+let writeToken = '';
+export function setWriteToken(value) { writeToken = value; }
 export async function request(path, options = {}) {
-  const response = await fetch('/api/' + path, {...options,headers:{'Content-Type':'application/json',...options.headers}});
+  const response = await fetch('/api/' + path, {...options,headers:{'Content-Type':'application/json',...(writeToken?{Authorization:'Bearer '+writeToken}:{}),...options.headers}});
   if (!response.ok) { const error = await response.json().catch(()=>({})); throw Error(error.error || 'Could not connect to the server.'); }
   return response.status === 204 ? null : response.json();
 }

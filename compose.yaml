@@ -6,6 +6,9 @@ services:
     volumes:
       - palette-data:/app/data
     environment:
+      LOCKED_MODE: ${LOCKED_MODE:-false}
+      LOCKED_DOMAINS: ${LOCKED_DOMAINS:-}
+      WRITE_TOKEN: ${WRITE_TOKEN:-}
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-}
     extra_hosts:

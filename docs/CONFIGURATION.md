@@ -92,3 +92,23 @@ Font families without an uploaded file use the [Google Fonts CSS API](https://de
 Pairing details and the font editor include **Download from Google Fonts** links. These open the full family page on fonts.google.com, where **Get font → Download all** provides the font family. This avoids presenting a language-subset webfont as the complete family. Downloads happen only when the user requests them through Google Fonts.
 
 Font names must exist in the Google Fonts catalog for cloud previews. An unknown name or network failure shows an unavailable status, a catalog search link, and a retry action. The temporary fallback sample is explicitly identified. Existing uploaded fonts continue to use their uploaded files and provide a direct download link. Google Fonts requires internet access; uploaded fonts remain available offline. JSON backups store Google font family metadata, while uploaded font binaries remain embedded as before.
+
+## Host-controlled locked mode
+
+Configure these variables on the server, never in the browser or SQLite settings:
+
+```dotenv
+LOCKED_MODE=false
+LOCKED_DOMAINS=inspiration.example.com,public.example.org
+WRITE_TOKEN=replace-with-a-random-secret-of-at-least-32-characters
+```
+
+`LOCKED_DOMAINS` accepts comma-separated hostnames without schemes, paths, or wildcards. Each entry includes its subdomains and all ports. Requests addressed to these domains, or carrying their Origin/Referer, cannot mutate data even with the write token. All unsafe API methods are blocked before JSON parsing: palette/font creation, editing, deletion, favorites, folders, bulk operations, backup imports, settings changes, connection tests, Instagram fetching, and vision analysis. Reads and exports remain available. The UI shows a read-only banner.
+
+Domain headers are client-controlled and cannot authenticate a caller. Therefore, once any locked domain is configured, **every write through every other address also requires `WRITE_TOKEN`**. Without a token, all writes are denied. On an unlocked address, enter the token in the read-only banner to enable editing; it stays in page memory until reload. API clients use `Authorization: Bearer <token>`. A token can also protect writes without configuring domains. Use a unique randomly generated secret (`openssl rand -hex 32`); never embed it in frontend code, URLs, exported files, or `VITE_` variables. Only give the token to trusted administrators: it grants access to all write operations, including server-side Ollama requests.
+
+Set `LOCKED_MODE=true` to deny all API writes on the entire instance, regardless of token or request headers. This is the strongest choice for a public read-only deployment. With all three variables unset, the existing unauthenticated shared-workspace behavior remains.
+
+Compose reads these variables from the host `.env`; run `docker compose up -d` after changing them. For local Node runs, export them in the shell before starting the app (`.env` is not loaded automatically). Invalid configuration prevents startup. Keep `.env` private.
+
+Use HTTPS for administrator access. A reverse proxy must preserve the public `Host` header and reject unexpected hosts. Forwarded headers never authorize writes. Do not expose an additional unprotected app instance sharing the same database. Origin/Referer and browser fetch metadata provide additional browser protections, but authentication is what prevents header spoofing from granting writes. The app does not provide separate user accounts or read privacy. Locked mode controls application API mutations; the process still opens SQLite and may create its normal schema/WAL files at startup.
