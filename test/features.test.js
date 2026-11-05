@@ -32,7 +32,14 @@ test('color extraction identifies dominant colors and ignores transparent pixels
  assert.deepEqual(extractColors(new Uint8ClampedArray([100,150,200,255])) , ['#6496C8']);
 });
 test('multiple analysis palettes and pairings survive, invalid model output is dropped',()=>{
- const result=cleanAnalysis({palettes:[{name:'One',colors:['#123456']},{name:'Two',colors:['#ABCDEF']},{colors:['invalid']}],pairings:[{name:'A',fonts:[{family:'Georgia'},{family:'Arial'}]},{name:'B',fonts:[{family:'Verdana'}]},{fonts:[{}]}]});assert.equal(result.palettes.length,2);assert.equal(result.pairings.length,2);assert.equal(result.pairings[0].fonts.length,2);assert.equal(result.pairings[0].fonts[0].file,'');assert.deepEqual(cleanAnalysis(null),{palettes:[],pairings:[]});
+ const result=cleanAnalysis({palettes:[{name:'One',colors:['#123456']},{name:'Two',colors:['#ABCDEF']},{colors:['invalid']}],pairings:[{name:'A',fonts:[{family:'Georgia'},{family:'Arial'}]},{name:'B',fonts:[{family:'Verdana'}]},{fonts:[{}]}]});assert.equal(result.palettes.length,1);assert.deepEqual(result.palettes[0].colors,['#123456','#ABCDEF']);assert.equal(result.pairings.length,2);assert.equal(result.pairings[0].fonts.length,2);assert.equal(result.pairings[0].fonts[0].file,'');assert.deepEqual(cleanAnalysis(null),{palettes:[],pairings:[]});
+});
+test('single-swatch palettes from one image merge into one palette, multi-color palettes are kept',()=>{
+ const merged=cleanAnalysis({palettes:[{name:'CREAM',colors:['#EEEBDA']},{name:'INDIGO',colors:['#282B4A']},{name:'NAVY',colors:['#282b4a']}],pairings:[]});
+ assert.equal(merged.palettes.length,1);assert.deepEqual(merged.palettes[0].colors,['#EEEBDA','#282B4A']);
+ const mixed=cleanAnalysis({palettes:[{name:'Brand',colors:['#111111','#222222']},{name:'a',colors:['#333333']},{name:'b',colors:['#444444']}]});
+ assert.equal(mixed.palettes.length,2);assert.deepEqual(mixed.palettes.find(p=>p.name==='Brand').colors,['#111111','#222222']);
+ const lone=cleanAnalysis({palettes:[{name:'Solo',colors:['#555555']}]});assert.equal(lone.palettes.length,1);assert.equal(lone.palettes[0].name,'Solo');
 });
 test('vision adapter sends the image and handles model errors without fabricating results',async()=>{
  const previousFetch=globalThis.fetch;const previousModel=process.env.OLLAMA_MODEL;process.env.OLLAMA_MODEL='test-vision';
